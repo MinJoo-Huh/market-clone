@@ -33,6 +33,22 @@ footer {
   font-weight: bold;
 }
 
+@keyframes icons_move {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
 .footer-icons__img {
   width: 30px;
+}
+
+.footer-icons:hover .footer-icons__img {
+  animation: 2s icons_move infinite;
 }
