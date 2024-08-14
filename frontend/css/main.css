@@ -27,8 +27,8 @@ main {
 
 .item-list__img img {
   position: absolute;
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
 }
 
 .item-list__info div {
@@ -74,6 +74,8 @@ main {
   cursor: pointer;
 
   transition: all 0.2s ease-in-out;
+
+  text-decoration: none; /*밑줄 없애기*/
 }
 
 .write-btn:hover {
