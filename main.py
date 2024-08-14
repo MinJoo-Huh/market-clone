@@ -63,6 +63,12 @@ async def get_image(item_id):
                                   """).fetchone()[0]  #특정 아이디에 맞는 이미지만 가져오고 싶다. tuple?
         return Response(content=bytes.fromhex(image_bytes), media_type='image/*') #hex로 된 것을 bytes로 바꿔주겠다.
 
+@app.post('/signup')
+def signup(id:Annotated[str, Form()], password:Annotated[str, Form()]):
+    print(id, password)
+    return '200'
+
+
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 
