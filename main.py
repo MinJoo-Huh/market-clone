@@ -2,6 +2,8 @@ from fastapi import FastAPI, UploadFile, Form, Response
 from fastapi.responses import JSONResponse      #json 파일 보내기
 from fastapi.encoders import jsonable_encoder   #json code로 변경하기
 from fastapi.staticfiles import StaticFiles
+from fastapi_login import LoginManager
+from fastapi_login.exceptions import InvalidCredentialsException    # 유효하지 않는 에러 처리
 from typing import Annotated
 import sqlite3
 
@@ -21,6 +23,51 @@ cur.execute(f"""
             """)    # IF NOT EXISTS : 테이블이 없을 때만 생성한다.
 
 app = FastAPI()
+
+SECRET = "super-coding"
+manager = LoginManager(SECRET, '/login')    # 적당한 토큰을 만들어주는 라이브러리
+
+@manager.user_loader()
+def query_user(id):
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    user = cur.execute(f"""
+                       SELECT * FROM users WHERE id = '{id}'
+                       """).fetchone()
+    return user
+
+@app.post('/login')
+def login(id:Annotated[str, Form()], 
+           password:Annotated[str, Form()]):
+    user = query_user(id)
+    if not user:
+        raise InvalidCredentialsException   # 유효하지 않는 에러 처리리
+    elif password != user['password']:
+        raise InvalidCredentialsException
+    
+    access_token = manager.create_access_token(data={
+        'id':user['id'],
+        'name':user['name'],
+        'email':user['email']
+    })
+    
+    return {'access_token': access_token}
+    
+
+@app.post('/signup')
+def signup(id:Annotated[str, Form()], 
+           password:Annotated[str, Form()],
+           name:Annotated[str, Form()],
+           email:Annotated[str, Form()]           
+           ):
+    cur.execute(f"""
+                INSERT INTO users(id, name, email, password)
+                VALUES ('{id}', '{name}', '{email}','{password}')
+                """)
+    con.commit()
+    return '200'
+
+
 
 @app.get('/items')
 async def get_items():
@@ -63,18 +110,7 @@ async def get_image(item_id):
                                   """).fetchone()[0]  #특정 아이디에 맞는 이미지만 가져오고 싶다. tuple?
         return Response(content=bytes.fromhex(image_bytes), media_type='image/*') #hex로 된 것을 bytes로 바꿔주겠다.
 
-@app.post('/signup')
-def signup(id:Annotated[str, Form()], 
-           password:Annotated[str, Form()],
-           name:Annotated[str, Form()],
-           email:Annotated[str, Form()]           
-           ):
-    cur.execute(f"""
-                INSERT INTO users(id, name, email, password)
-                VALUES ('{id}', '{name}', '{email}','{password}')
-                """)
-    con.commit()
-    return '200'
+
 
 # 기존 회원 확인 코드 넣기 - "id가 존재합니다"
 # @app.get('/signup/{user_id_email}')
