@@ -76,7 +76,20 @@ const renderData = (data) => {
 
 // backend에서 데이터 가져오기기
 const fetchList = async () => {
-  const res = await fetch("/items");
+  // token 가져오기
+  const accessToken = window.localStorage.getItem("token");
+  const res = await fetch("/items", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  // token이 없을 경우,
+  if (res.status === 401) {
+    alert("로그인이 필요합니다.");
+    window.location.pathname = "/login.html";
+    return;
+  }
   const data = await res.json();
   renderData(data);
 };

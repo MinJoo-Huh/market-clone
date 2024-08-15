@@ -1,16 +1,5 @@
 const form = document.querySelector("#login-form");
 
-// 비밀번호 확인 함수
-const checkPassword = () => {
-  const formData = new FormData(form);
-  const password1 = formData.get("password");
-  const password2 = formData.get("password2");
-
-  if (password1 === password2) {
-    return true;
-  } else return false;
-};
-
 // submit 제출되었을 때 함수
 const handleSubmit = async (event) => {
   event.preventDefault();
@@ -29,13 +18,36 @@ const handleSubmit = async (event) => {
   });
 
   const data = await res.json();
-  console.log("access token : ", data);
 
   // 로그인 성공 or 에러 처리
   if (res.status === 200) {
     // 성공
-    alert("로그인에 성공했습니다.");
+    //alert("로그인에 성공했습니다.");
+    const accessToken = data.access_token;
+    window.localStorage.setItem("token", accessToken);
+    //window.sessionStorage.setItem("token", accessToken);
+    alert("로그인되었습니다.");
+
+    // const infoDiv = document.querySelector("#info");
+    // infoDiv.innerText = "로그인되었습니다";
+
     window.location.pathname = "/";
+
+    // const btn = document.createElement("button");
+    // btn.innerText = "상품 가져오기";
+    // btn.addEventListener("click", async () => {
+    //   const res = await fetch("/items", {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`, //bearer : prefix
+    //     },
+    //   });
+
+    //   const data = await res.json();
+    //   console.log(data);
+    // });
+    // infoDiv.appendChild(btn);
+
+    //window.location.pathname = "/";
   } else if (res.status === 401) {
     // Unauthorized
     alert("id 혹은 password가 틀렸습니다.");
