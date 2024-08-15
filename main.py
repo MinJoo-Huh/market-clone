@@ -64,9 +64,37 @@ async def get_image(item_id):
         return Response(content=bytes.fromhex(image_bytes), media_type='image/*') #hex로 된 것을 bytes로 바꿔주겠다.
 
 @app.post('/signup')
-def signup(id:Annotated[str, Form()], password:Annotated[str, Form()]):
-    print(id, password)
+def signup(id:Annotated[str, Form()], 
+           password:Annotated[str, Form()],
+           name:Annotated[str, Form()],
+           email:Annotated[str, Form()]           
+           ):
+    cur.execute(f"""
+                INSERT INTO users(id, name, email, password)
+                VALUES ('{id}', '{name}', '{email}','{password}')
+                """)
+    con.commit()
     return '200'
+
+# 기존 회원 확인 코드 넣기 - "id가 존재합니다"
+# @app.get('/signup/{user_id_email}')
+# async def get_sign_id(user_id_email):
+#     con.row_factory = sqlite3.Row   #column명도 같이 가져옴.
+#     cur = con.cursor()
+#     select_id = cur.execute(f"""
+#                        SELECT id FROM users WHERE id = {user_id_email[0]};
+#                        """)
+#     select_email = cur.execute(f"""
+#                        SELECT email FROM users WHERE id = {user_id_email[1]};
+#                        """)
+    
+#     print("select id : " + select_id)
+#     print("select email : " + select_email)
+    
+#     # 없을 경우 예외 처리
+    
+#     return "id, email 정보를 받았습니다."
+
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
