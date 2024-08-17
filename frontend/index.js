@@ -11,21 +11,6 @@
     </div> */
 }
 
-// 시간 바꾸기
-const calcTime = (Timestamp) => {
-  // 한국시간 UTC+9
-  const curTime = new Date().getTime() - 9 * 60 * 60 * 1000;
-  const time = new Date(curTime - Timestamp);
-  const hour = time.getHours();
-  const minute = time.getMinutes();
-  const second = time.getSeconds();
-
-  if (hour > 0) return `${hour}시간 전`;
-  else if (minute > 0) return `${minute}분 전`;
-  else if (second > 0) return `${second}초 전`;
-  else return "방금 전";
-};
-
 // 데이터 html에 올리기
 const renderData = (data) => {
   const main = document.querySelector("main");
